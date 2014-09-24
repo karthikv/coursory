@@ -1,0 +1,6 @@
+*.sw[pon]
+.env
+.vagrant
+Vagrantfile
+data/
+courses.xml

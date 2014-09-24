@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/normalize.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Courgette" />
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Explore Courses Instant</h1>
+        <p>Search for any Stanford course and get results quickly.</p>
+
+        <input type="text" placeholder="CS 106A, Psychology, Social Dance..." />
+      </header>
+
+      <div class="results"></div>
+    </div>
+
+    <script type="text/template" class="courses-template">
+      {% courses.forEach(function(course) { %}
+        <div class="course">
+          <h2>{{ course.subject }} {{ course.code }}: {{ course.title }}</h2>
+
+          <div class="meta">
+            <!-- TODO: term, instructors -->
+            {{ course.year }} <span class="separator">&bull;</span>
+            {{ course.gers }} 
+          </div>
+
+          <p class="description">{{ course.description }}</p>
+        </div>
+      {% }); %} 
+    </script>
+
+    <script src="/js/underscore.min.js"></script>
+    <script src="/js/search.js"></script>
+  </body>
+</html>

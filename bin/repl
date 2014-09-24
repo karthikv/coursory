@@ -1,0 +1,2 @@
+#!/bin/bash
+bundle exec pry -I./ -r app.rb -r awesome_print

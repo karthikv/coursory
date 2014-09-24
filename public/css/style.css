@@ -1,0 +1,59 @@
+body {
+  background: #f6f6f6;
+  font: 16px/1.5 "Source Sans Pro";
+  color: #333;
+}
+
+.wrapper {
+  width: 650px;
+  margin: 0 auto;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1;
+}
+
+p {
+  margin-top: 0;
+}
+
+header h1 {
+  font-size: 60px;
+  font-family: 'Courgette';
+  margin-bottom: 10px;
+}
+
+header p {
+  font-size: 22px;
+  color: #999;
+}
+
+header input {
+  width: 630px;
+  border: 1px solid #ccc;
+  padding: 6px 8px;
+  outline: none;
+  color: #666;
+  margin-bottom: 10px;
+
+  border-radius: 2px;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  -ms-border-radius: 2px;
+  -o-border-radius: 2px;
+}
+
+.course h2 {
+  margin-bottom: 0;
+  font-weight: normal;
+}
+
+.course .meta {
+  overflow: hidden;
+  color: #666;
+  margin-bottom: 5px;
+}
+
+.course .separator {
+  padding: 0 3px;
+}
