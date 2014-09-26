@@ -75,6 +75,8 @@ def main
   })
 
   Course.each do |course|
+    # don't index courses that are not given
+    next if course.terms == [] || course.instructors == []
     document = course.to_mongo
 
     # subject and code are combined into one field since they're often searched

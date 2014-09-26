@@ -12,6 +12,9 @@ module ECI
       key :description, String
       key :gers, String
 
+      key :terms, Array
+      key :instructors, Array
+
       # elastic search ID
       key :es_uid, String
 
@@ -24,7 +27,9 @@ module ECI
           :code => code,
           :title => title,
           :description => description,
-          :gers => gers
+          :gers => gers,
+          :terms => terms,
+          :instructors => instructors
         }
       end
     end

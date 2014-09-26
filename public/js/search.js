@@ -1,4 +1,6 @@
 (function(window, document, undefined) {
+  var DESCRIPTION_CONDENSED_LENGTH = 175;
+
   _.templateSettings = {
     escape: /\{\{(.+?)\}\}/g,
     evaluate: /\{\%(.+?)\%\}/g
@@ -32,11 +34,20 @@
     request.addEventListener('load', function() {
       if (request.status === 200) {
         var courses = JSON.parse(request.responseText);
+
+        // condense descriptions to ~200 words
+        courses.forEach(function(course) {
+          if (course.description.length > DESCRIPTION_CONDENSED_LENGTH) {
+            course.condensedDescription = course.description.substring(0,
+              DESCRIPTION_CONDENSED_LENGTH) + '...';
+          }
+        });
+
         results.innerHTML = renderCourses({courses: courses});
       }
     });
 
     request.open('GET', '/search?query=' + encodeURIComponent(query), true);
     request.send();
-  }, 200));
+  }, 150));
 })(this, this.document);

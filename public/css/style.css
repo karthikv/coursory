@@ -57,3 +57,11 @@ header input {
 .course .separator {
   padding: 0 3px;
 }
+
+.course.active .description {
+  display: block;
+}
+
+.course .description {
+  display: none;
+}

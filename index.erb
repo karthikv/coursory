@@ -29,10 +29,16 @@
 
           <div class="meta">
             <!-- TODO: term, instructors -->
-            {{ course.year }} <span class="separator">&bull;</span>
-            {{ course.gers }} 
+            {{ course.terms.join(', ') }} <span class="separator">&bull;</span>
+            {{ course.instructors.slice(0, 2).join('; ') }}
+            
+            {% if (course.gers !== '') { %}
+              <span class="separator">&bull;</span>
+              {{ course.gers }}
+            {% } %}
           </div>
 
+          <p class="condensed-description">{{ course.condensedDescription }}</p>
           <p class="description">{{ course.description }}</p>
         </div>
       {% }); %} 
