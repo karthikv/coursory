@@ -55,21 +55,19 @@
                 </div>
 
                 <div class="meta">
+                  {{ section.component }}
+
                   {% if (section.units) { %}
+                    <span class="separator">&bull;</span>
                     {{ section.units }} units
                   {% } %}
 
                   {% if (section.instructors) { %}
-                    {% if (section.units) { %}
-                      <span class="separator">&bull;</span>
-                    {% } %}
-
+                    <span class="separator">&bull;</span>
                     {{ section.instructors }}
                   {% } %}
 
-                  {% if (section.units || section.instructors) { %}
-                    <span class="separator">&bull;</span>
-                  {% } %}
+                  <span class="separator">&bull;</span>
                   ID: {{ section.class_id }}
                 </div>
 
