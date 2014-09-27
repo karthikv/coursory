@@ -2,10 +2,6 @@
 require File.expand_path('../../app', __FILE__)
 require 'sanitize'
 
-TERM_MAP = {
-  '2014-2015 Autumn' => 'Autumn'
-}
-
 def main
   Course.each do |course|
     # get rid of 'GER:' prefix

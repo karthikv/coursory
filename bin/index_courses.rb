@@ -2,8 +2,6 @@
 require File.expand_path('../../app', __FILE__)
 require 'elasticsearch'
 
-INDEX_NAME = 'courses'
-TYPE_NAME = 'course'
 INDEXED_ATTRS = ['year', 'subject_code', 'title', 'description', 'gers']
 
 def main
@@ -88,7 +86,8 @@ def main
     document.delete_if {|key, value| !INDEXED_ATTRS.include?(key)}
     puts "Indexing #{document['subject_code']}: #{document['title']}"
 
-    data = client.index(:index => INDEX_NAME, :type => TYPE_NAME, :body => document)
+    data = client.index(:index => ECI::App::EC_INDEX_NAME, :type => ECI::App::EC_TYPE_NAME,
+                        :body => document)
     course.es_uid = data['_id']
     course.save
   end
