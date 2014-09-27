@@ -50,4 +50,27 @@
     request.open('GET', '/search?query=' + encodeURIComponent(query), true);
     request.send();
   }, 150));
+
+  results.addEventListener('click', function(event) {
+    var target = event.target;
+    while (target && !target.classList.contains('course')) {
+      target = target.parentNode;
+    }
+
+    if (!target) {
+      return;
+    }
+
+    // target is a .course element
+    var course = target;
+    var toggleButton = course.querySelector('h2 .toggle');
+
+    if (course.classList.contains('active')) {
+      course.classList.remove('active');
+      toggleButton.textContent = 'Expand';
+    } else {
+      course.classList.add('active');
+      toggleButton.textContent = 'Contract';
+    }
+  });
 })(this, this.document);

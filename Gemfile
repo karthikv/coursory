@@ -13,6 +13,8 @@ gem 'elasticsearch'  # searching
 gem 'mongo_mapper'
 gem 'bson_ext'
 
+gem 'sanitize'  # cleaning HTML
+
 group :development do
   gem 'thin'  # web server
   gem 'pry'  # debugging

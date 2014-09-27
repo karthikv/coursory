@@ -25,21 +25,63 @@
     <script type="text/template" class="courses-template">
       {% courses.forEach(function(course) { %}
         <div class="course">
-          <h2>{{ course.subject }} {{ course.code }}: {{ course.title }}</h2>
+          <h2>
+            {{ course.subject }} {{ course.code }}: {{ course.title }}
+            <button class="toggle">Expand</button>
+          </h2>
 
           <div class="meta">
-            <!-- TODO: term, instructors -->
             {{ course.terms.join(', ') }} <span class="separator">&bull;</span>
             {{ course.instructors.slice(0, 2).join('; ') }}
             
-            {% if (course.gers !== '') { %}
+            {% if (course.gers) { %}
               <span class="separator">&bull;</span>
               {{ course.gers }}
             {% } %}
           </div>
 
-          <p class="condensed-description">{{ course.condensedDescription }}</p>
-          <p class="description">{{ course.description }}</p>
+          <div class="condensed">
+            <p class="description">{{ course.condensedDescription }}</p>
+          </div>
+
+          <div class="expanded">
+            <p class="description">{{ course.description }}</p>
+
+            <h3 class="schedule">Schedule</h3>
+            {% course.sections.forEach(function(section, i) { %}
+              <div class="section {% if (i === 0) { %} first {% } %}">
+                <div class="term {{ section.term.toLowerCase() }}">
+                  {{ section.term }}
+                </div>
+
+                <div class="meta">
+                  {% if (section.units) { %}
+                    {{ section.units }} units
+                  {% } %}
+
+                  {% if (section.instructors) { %}
+                    {% if (section.units) { %}
+                      <span class="separator">&bull;</span>
+                    {% } %}
+
+                    {{ section.instructors }}
+                  {% } %}
+
+                  {% if (section.units || section.instructors) { %}
+                    <span class="separator">&bull;</span>
+                  {% } %}
+                  ID: {{ section.class_id }}
+                </div>
+
+                {{ section.schedule }}
+
+                {% if (section.notes) { %}
+                  <br />
+                  Notes: {{ section.notes }}
+                {% } %}
+              </div>
+            {% }); %}
+          </div>
         </div>
       {% }); %} 
     </script>

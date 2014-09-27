@@ -29,7 +29,8 @@ module ECI
           :description => description,
           :gers => gers,
           :terms => terms,
-          :instructors => instructors
+          :instructors => instructors,
+          :sections => sections,
         }
       end
     end

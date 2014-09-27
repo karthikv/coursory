@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 require File.expand_path('../../app', __FILE__)
+require 'sanitize'
 
 TERM_MAP = {
   '2014-2015 Autumn' => 'Autumn'
@@ -10,10 +11,14 @@ def main
     # get rid of 'GER:' prefix
     course.gers = course.gers.gsub(/^\s*GER:\s*/, '')
 
-    # compute and store all terms
-    terms = course.sections.map do |section|
-      section.term.gsub('2014-2015 ', '')
+    # clean section
+    course.sections.each do |section|
+      section.term = section.term.gsub('2014-2015 ', '')
+      section.schedule = Sanitize.clean(section.schedule).gsub(/\s*with.*?$/, '')
     end
+
+    # compute and store all sections
+    terms = course.sections.map {|section| section.term}
     course.terms = terms.uniq
 
     # compute and store all instructors
@@ -27,8 +32,7 @@ def main
 
     course.instructors = instructors
 
-    puts "Cleaning #{course.subject} #{course.code}; terms=#{course.terms}, " +
-         "instructors=#{course.instructors}"
+    puts "Cleaning #{course.subject} #{course.code}"
     course.save
   end
 end
