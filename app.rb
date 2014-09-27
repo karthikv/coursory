@@ -9,6 +9,7 @@ Dotenv.load
 
 require 'nyny'
 require 'models'
+require 'search'
 
 module ECI
   class App < NYNY::App
@@ -32,28 +33,7 @@ module ECI
         halt
       end
 
-      # search via Elasticsearch
-      es = Elasticsearch::Client.new
-      results = es.search(
-        :index => ES_INDEX_NAME,
-        :type => ES_TYPE_NAME,
-        :body => {
-          :query => {
-            :multi_match => {
-              :query => query,
-
-              # boost subject and title so that precise searches give the right results
-              :fields => ['year', 'subject_code^2', 'title^1.5', 'description', 'gers'],
-              :minimum_should_match => '70%'
-            }
-          }
-        }
-      )
-
-      hits = results['hits']['hits']
-      courses = hits.map {|hit| Course.where(:es_uid => hit['_id']).first}
-      courses = courses.map {|course| course.to_public_hash}
-
+      courses = ECI::Search.match(query)
       headers['Content-Type'] = 'application/json'
       courses.to_json
     end
