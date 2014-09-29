@@ -1,9 +1,19 @@
 require 'elasticsearch'
+require 'json'
 
 module ECI
   class Search
     ES_INDEX_NAME = 'courses'
     ES_TYPE_NAME = 'course'
+
+    TERMS = ['Autumn', 'Winter', 'Spring', 'Summer']
+    UNITS = [1, 2, 3, 4, 5, 6]
+
+    GERS =  ['DB-EngrAppSci', 'DB-Hum', 'DB-Math', 'DB-NatSci', 'DB-SocSci',
+      'EC-AmerCul', 'EC-EthicReas', 'EC-Gender', 'EC-GlobalCom', 'IHUM-1',
+      'IHUM-2', 'IHUM-3', 'Language', 'THINK', 'WAY-A-II', 'WAY-AQR', 'WAY-CE',
+      'WAY-ED', 'WAY-ER', 'WAY-FR', 'WAY-SI', 'WAY-SMA', 'Writing 1', 'Writing 2',
+      'Writing SLE']
 
     SUBJECTS = ['AA', 'AMELANG', 'ACCT', 'AFRICAAM', 'AFRICAST', 'AMSTUD',
       'CSP', 'ANTHRO', 'ANES', 'CEE', 'APPPHYS', 'ARABLANG', 'ARCHLGY',
@@ -36,29 +46,74 @@ module ECI
       'TIBETLNG', 'UAR', 'URBANST', 'UROL', 'WELLNESS', 'UAC', 'UGXFER', 'WCT',
       'SPEC']
 
-    # Returns an array of courses that match the given query.
-    def self.match(query)
-      # search via Elasticsearch
-      es = Elasticsearch::Client.new
-      results = es.search(
-        :index => ES_INDEX_NAME,
-        :type => ES_TYPE_NAME,
-        :body => {
-          :query => {
-            :multi_match => {
-              :query => self.split_course_numbers(query),
+    FILTER_KEYS = [:terms, :units, :gers, :subjects]
+    FILTER_VALUES = {:terms => TERMS, :units => UNITS, :gers => GERS, :subjects => SUBJECTS}
 
-              # boost subject and title so that precise searches give the right results
-              :fields => ['year', 'subject_code^2', 'title^1.5', 'description', 'gers'],
-              :minimum_should_match => '70%'
+    # Extracts filters from the user-inputted search parameters. Returns a hash
+    # of filters to be passed to match() below.
+    def self.extract_filters(params)
+      filters = {}
+
+      FILTER_KEYS.each do |key|
+        next if !params[key]
+
+        begin
+          terms = JSON.parse(params[key])
+        rescue JSON::ParserError
+          # ignore filter
+        else
+          terms = terms.select {|term| FILTER_VALUES[key].include?(term)}
+          filters[key] = terms if terms.length > 0
+        end
+      end
+
+      # subjects -> subject for searching
+      if filters[:subjects]
+        filters[:subject] = filters[:subjects]
+        filters.delete(:subjects)
+      end
+
+      filters
+    end
+
+    # Returns an array of courses that match the given query and filters.
+    def self.match(query, filters)
+      if !query || query.empty?
+        # we're just filtering, so match all
+        multi_match_query = {:match_all => {}}
+      else
+        multi_match_query = {
+          :multi_match => {
+            :query => self.split_course_numbers(query),
+
+            # boost subject and title so that precise searches give the right results
+            :fields => ['year', 'subject_code^2', 'title^1.5', 'description', 'gers'],
+            :minimum_should_match => '70%',
+          }
+        }
+      end
+
+      if filters.empty?
+        query = multi_match_query
+      else
+        query = {
+          :filtered => {
+            :query => multi_match_query,
+            :filter => {
+              :terms => filters
             }
           }
         }
-      )
+      end
 
+      # search via Elasticsearch
+      es = Elasticsearch::Client.new
+      results = es.search(:index => ES_INDEX_NAME, :type => ES_TYPE_NAME,
+        :body => {:query => query})
       hits = results['hits']['hits']
+
       courses = hits.map {|hit| Course.where(:es_uid => hit['_id']).first}
-      courses = courses.map {|course| course.to_public_hash}
+      courses.map {|course| course.to_public_hash}
     end
 
     # Finds course numbers in the form '{subject}{code}', like 'CS106A' and

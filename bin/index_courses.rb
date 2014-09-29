@@ -2,7 +2,8 @@
 require File.expand_path('../../app', __FILE__)
 require 'elasticsearch'
 
-INDEXED_ATTRS = ['year', 'subject_code', 'title', 'description', 'gers']
+INDEXED_ATTRS = ['year', 'subject', 'code', 'subject_code', 'title',
+                 'description', 'gers', 'instructors', 'terms', 'units']
 
 def main
   client = Elasticsearch::Client.new(:log => true)
@@ -44,6 +45,16 @@ def main
             :search_analyzer => 'standard',
           },
 
+          :subject => {
+            :type => 'string',
+            :index => 'not_analyzed',
+          },
+
+          :code => {
+            :type => 'string',
+            :index => 'not_analyzed',
+          },
+
           :subject_code => {
             :type => 'string',
             :index_analyzer => 'autocomplete',
@@ -64,9 +75,21 @@ def main
 
           :gers => {
             :type => 'string',
+            :index => 'not_analyzed',
+          },
+
+          :instructors => {
+            :type => 'string',
             :index_analyzer => 'autocomplete',
             :search_analyzer => 'standard',
           },
+
+          :terms => {
+            :type => 'string',
+            :index => 'not_analyzed',
+          },
+
+          :units => {:type => 'integer'},
         }
       }
     }
@@ -81,7 +104,7 @@ def main
     # for together. note that we allow for an optional space between them.
     subject = document['subject']
     code = document['code']
-    document['subject_code'] = "#{subject} #{code} #{subject}#{code}"
+    document['subject_code'] = "#{subject} #{code}"
 
     document.delete_if {|key, value| !INDEXED_ATTRS.include?(key)}
     puts "Indexing #{document['subject_code']}: #{document['title']}"

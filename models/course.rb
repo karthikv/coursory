@@ -10,10 +10,12 @@ module ECI
 
       key :title, String
       key :description, String
-      key :gers, String
+      key :ger_str, String
+      key :gers, Array
 
       key :terms, Array
       key :instructors, Array
+      key :units, Array
 
       # elastic search ID
       key :es_uid, String

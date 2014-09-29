@@ -5,7 +5,7 @@ module ECI
 
       key :class_id, String
       key :term, String
-      key :units, Integer
+      key :units, String
 
       key :section_num, String
       key :component, String

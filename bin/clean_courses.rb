@@ -26,10 +26,12 @@ COMPONENT_SHORTHAND = {
   'T/D' => 'Thesis/Dissertation',
 }
 
+UNIT_RANGE_REGEX = /\A\d+-\d+\z/
+
 def main
   Course.each do |course|
-    # get rid of 'GER:' prefix
-    course.gers = course.gers.gsub(/^\s*GER:\s*/, '')
+    # compute array of GERs
+    course.gers = course.ger_str.gsub('GER:', '').split(',').map(&:strip)
 
     # clean section
     course.sections.each do |section|
@@ -51,8 +53,24 @@ def main
         instructors.concat(section_instructors)
       end
     end
+    course.instructors = instructors.uniq
 
-    course.instructors = instructors
+    # compute and store units
+    units = []
+    course.sections.each do |section|
+      section_units = section.units
+      next if !section_units || section_units == ''
+
+      # section units may be a range like '3-5'; parse it
+      if UNIT_RANGE_REGEX.match(section_units)
+        range = Range.new(*section_units.split('-').map(&:to_i))
+        units.concat(range.to_a)
+      else
+        units.append(section_units.to_i)
+      end
+    end
+    course.units = units.uniq
+
     puts "Cleaning #{course.subject} #{course.code}"
     course.save
   end

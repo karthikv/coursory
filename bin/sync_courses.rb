@@ -9,7 +9,7 @@ COURSE_KEY_TO_TAG = {
   :code => 'code',
   :title => 'title',
   :description => 'description',
-  :gers => 'gers'
+  :ger_str => 'gers'
 }
 
 # Section model key => XML tag
