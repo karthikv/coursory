@@ -12,7 +12,7 @@
   var renderCourses = _.template(coursesTemplate.innerHTML);
 
   var results = document.getElementsByClassName('results')[0];
-  var input = document.querySelector('input[type="text"]');
+  var searchBox = document.querySelector('input[type="text"]');
   var checkboxes = document.querySelectorAll('input[type="checkbox"]');
 
   /* Returns the active filters based on checked checkboxes. */
@@ -46,7 +46,7 @@
 
   /* Updates the search results based on the inputted query and filters. */
   function updateSearchResults() {
-    var query = input.value;
+    var query = searchBox.value;
     var filters = getFilters();
 
     if (!query && _.isEmpty(filters)) {
@@ -67,7 +67,7 @@
   }
 
   // update results when user input changes
-  input.addEventListener('keyup', _.debounce(updateSearchResults, 150));
+  searchBox.addEventListener('keyup', _.debounce(updateSearchResults, 150));
   Array.prototype.forEach.call(checkboxes, function(checkbox) {
     checkbox.addEventListener('change', updateSearchResults);
   });
@@ -100,4 +100,5 @@
   });
 
   updateSearchResults();
+  searchBox.focus();
 })(this, this.document);
