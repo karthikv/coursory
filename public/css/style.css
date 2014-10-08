@@ -1,6 +1,6 @@
 body {
   background: #f6f6f6;
-  font: 16px/1.5 "Source Sans Pro";
+  font: 16px/1.5 "Source Sans Pro", "PT Sans", "Helvetica Neue", Helvetica, Arial, Sans-serif;
   color: #333;
 }
 
@@ -14,7 +14,7 @@ p {
 
 header h1 {
   font-size: 60px;
-  font-family: 'Courgette';
+  font-family: "Courgette", "Georgia", "Times New Roman", "Times", Serif;
   margin-top: 0;
   margin-bottom: 10px;
 }
@@ -57,7 +57,7 @@ header input {
 }
 
 .sidebar h2 {
-  font-family: 'Courgette';
+  font-family: "Courgette", "Georgia", "Times New Roman", "Times", Serif;
 }
 
 .sidebar h3 {
@@ -103,6 +103,7 @@ header input {
   color: #3366bb;
   outline: none;
   margin-top: 2px;
+  padding-bottom: 2px;
 
   border-radius: 2px;
   -webkit-border-radius: 2px;
