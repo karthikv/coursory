@@ -9,8 +9,10 @@ def main
   client = Elasticsearch::Client.new(:log => true)
 
   # configure index for searching 
-  client.indices.delete(:index => 'courses')
-  client.indices.create(:index => 'courses', :body => {
+  indices = client.indices
+  indices.delete(:index => 'courses') if indices.exists(:index => 'courses')
+
+  indices.create(:index => 'courses', :body => {
     :settings => {
       :number_of_shards => 1,
 
