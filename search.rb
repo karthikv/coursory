@@ -94,25 +94,33 @@ module ECI
       end
 
       if filters.empty?
-        query = multi_match_query
+        body = {:query => multi_match_query}
       else
-        query = {
-          :filtered => {
-            :query => multi_match_query,
-            :filter => {
-              :terms => filters
+        body = {
+          :query => {
+            :filtered => {
+              :query => multi_match_query,
+              :filter => {
+                :terms => filters,
+              }
             }
           }
         }
+
+        if multi_match_query.has_key?(:match_all)
+          # no search query; sort filtered results alphabetically
+          body[:sort] = {:subject => {:order => :asc}}
+        end
       end
 
       # search via Elasticsearch
       es = Elasticsearch::Client.new
       results = es.search(:index => ES_INDEX_NAME, :type => ES_TYPE_NAME,
-        :body => {:query => query})
+        :body => body)
       hits = results['hits']['hits']
 
       courses = hits.map {|hit| Course.where(:es_uid => hit['_id']).first}
+      courses = courses.select {|course| course != nil}
       courses.map {|course| course.to_public_hash}
     end
 
