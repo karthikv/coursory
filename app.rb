@@ -25,7 +25,9 @@ module ECI
     # returns courses that match the given query in JSON
     get '/search' do
       filters = ECI::Search.extract_filters(params)
-      courses = ECI::Search.match(params[:query], filters)
+
+      page = params[:page] ? params[:page].to_i : 0
+      courses = ECI::Search.match(params[:query], filters, page)
 
       headers['Content-Type'] = 'application/json'
       courses.to_json

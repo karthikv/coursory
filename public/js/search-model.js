@@ -9,10 +9,12 @@
    * query should be a string. filters should be an object with up to four
    * keys: terms, units, gers, and subjects. values should be arrays of strings
    * that filter the respective key. For instance, { units: [1, 2] } limits the
-   * units to either 1 or 2. */
-  SearchModel.match = function(query, filters, callback) {
+   * units to either 1 or 2. page should be which page to return (0-indexed).
+   */
+  SearchModel.match = function(query, filters, page, callback) {
     // add query to querystring
-    var qs = 'query=' + encodeURIComponent(query);
+    var qs = 'page=' + encodeURIComponent(page) + '&query=' +
+      encodeURIComponent(query);
 
     // add each filter to querystring
     this.FILTER_CATEGORIES.forEach(function(category) {

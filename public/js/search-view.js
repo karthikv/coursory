@@ -14,6 +14,11 @@
   var results = document.getElementsByClassName('results')[0];
   var searchBox = document.querySelector('input[type="text"]');
   var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+  var loading = document.getElementsByClassName('loading')[0];
+
+  var oldQuery = null;
+  var oldFilters = null;
+  var page = 1;
 
   /* Returns the active filters based on checked checkboxes. */
   function getFilters() {
@@ -44,15 +49,26 @@
     return filters;
   }
 
-  /* Updates the search results based on the inputted query and filters. */
-  function updateSearchResults() {
+  /* Updates the search results based on the inputted query and filters.
+   * advancePage specifies whether to advance to the next page of results. */
+  function updateSearchResults(event, advancePage) {
     var query = searchBox.value;
     var filters = getFilters();
 
+    if (query === oldQuery && _.isEqual(filters, oldFilters) && !advancePage) {
+      return;
+    }
+
     if (!query && _.isEmpty(filters)) {
+      // nothing is being searched for
       results.innerHTML = renderCourses({courses: []});
     } else {
-      SearchModel.match(query, filters, function(courses) {
+      page = advancePage ? page + 1 : 0;
+      loading.classList.add('active');
+
+      SearchModel.match(query, filters, page, function(courses) {
+        loading.classList.remove('active');
+
         // limit length of descriptions
         courses.forEach(function(course) {
           if (course.description.length > DESCRIPTION_CONDENSED_LENGTH) {
@@ -61,9 +77,19 @@
           }
         });
 
-        results.innerHTML = renderCourses({courses: courses});
+        var coursesHTML = renderCourses({courses: courses});
+        if (advancePage && courses.length === 0) {
+          page -= 1;  // page number has saturated
+        } else if (advancePage && courses.length > 0) {
+          results.innerHTML += coursesHTML;
+        } else {
+          results.innerHTML = coursesHTML;
+        }
       });
     }
+
+    oldQuery = query;
+    oldFilters = filters;
   }
 
   // update results when user input changes
@@ -71,6 +97,15 @@
   Array.prototype.forEach.call(checkboxes, function(checkbox) {
     checkbox.addEventListener('change', updateSearchResults);
   });
+
+  // infinite scroll: update search results when user scrolls to bottom
+  window.addEventListener('scroll', _.debounce(function() {
+    var scrollY = window.scrollY || document.body.scrollTop;
+
+    if (window.innerHeight + scrollY >= document.body.offsetHeight) {
+      updateSearchResults(null, true);
+    }
+  }, 100));
 
   // expand/collapse elements that have a toggle button
   window.addEventListener('click', function(event) {

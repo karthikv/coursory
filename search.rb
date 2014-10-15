@@ -49,6 +49,8 @@ module ECI
     FILTER_KEYS = [:terms, :units, :gers, :subjects]
     FILTER_VALUES = {:terms => TERMS, :units => UNITS, :gers => GERS, :subjects => SUBJECTS}
 
+    RESULTS_PER_PAGE = 10
+
     # Extracts filters from the user-inputted search parameters. Returns a hash
     # of filters to be passed to match() below.
     def self.extract_filters(params)
@@ -76,8 +78,9 @@ module ECI
       filters
     end
 
-    # Returns an array of courses that match the given query and filters.
-    def self.match(query, filters)
+    # Returns an array of courses that match the given query and filters. page
+    # specifies which page of results to return (0-indexed)
+    def self.match(query, filters, page)
       if !query || query.empty?
         # we're just filtering, so match all
         multi_match_query = {:match_all => {}}
@@ -116,7 +119,7 @@ module ECI
       # search via Elasticsearch
       es = Elasticsearch::Client.new
       results = es.search(:index => ES_INDEX_NAME, :type => ES_TYPE_NAME,
-        :body => body)
+        :body => body, :from => page * RESULTS_PER_PAGE)
       hits = results['hits']['hits']
 
       courses = hits.map {|hit| Course.where(:es_uid => hit['_id']).first}

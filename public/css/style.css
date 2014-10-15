@@ -195,6 +195,15 @@ header input {
   background-color: #ff7732;
 }
 
+.loading {
+  display: none;
+  margin: 0 auto;
+}
+
+.loading.active {
+  display: block;
+}
+
 /**
  * For modern browsers
  * 1. The space content is one way to avoid an Opera bug when the
