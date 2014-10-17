@@ -89,6 +89,10 @@ header input {
   color: #aaa;
 }
 
+.results .empty.append {
+  margin-top: 50px;
+}
+
 .course h2 {
   margin-bottom: 0;
   font-weight: normal;
@@ -197,7 +201,7 @@ header input {
 
 .loading {
   display: none;
-  margin: 0 auto;
+  margin: 20px auto 0 auto;
 }
 
 .loading.active {

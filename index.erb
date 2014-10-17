@@ -93,8 +93,12 @@
     </div>
 
     <script type="text/template" class="courses-template">
-      {% if (courses.length === 0) { %}
+      {% if (noSearch) { %}
         <p class="empty">No results yet! Search for something or select a filter.</p>
+      {% } else if (courses.length === 0 && appendResults) { %}
+        <p class="empty append">No more results.</p>
+      {% } else if (courses.length === 0) { %}
+        <p class="empty">No results found.</p>
       {% } %}
 
       {% courses.forEach(function(course) { %}

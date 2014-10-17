@@ -18,6 +18,7 @@
 
   var oldQuery = null;
   var oldFilters = null;
+  var noMorePages = false;
   var page = 1;
 
   /* Returns the active filters based on checked checkboxes. */
@@ -49,53 +50,92 @@
     return filters;
   }
 
-  /* Updates the search results based on the inputted query and filters.
-   * advancePage specifies whether to advance to the next page of results. */
-  function updateSearchResults(event, advancePage) {
-    var query = searchBox.value;
-    var filters = getFilters();
+  /* Searches based on the inputted query and filters. advancePage specifies
+   * whether to advance to the next page of search results. If advancePage is
+   * false, this function begins a new search with the latest user input. */
+  function search(advancePage) {
+    var query;
+    var filters;
 
-    if (query === oldQuery && _.isEqual(filters, oldFilters) && !advancePage) {
-      return;
+    if (advancePage) {
+      query = oldQuery;
+      filters = oldFilters;
+
+      // can't advance if there aren't any more pages
+      if (noMorePages) {
+        return;
+      }
+
+      page = page + 1;
+    } else {
+      query = searchBox.value;
+      filters = getFilters();
+
+      // don't update if results won't change
+      if (query === oldQuery && _.isEqual(filters, oldFilters)) {
+        return;
+      }
+
+      oldQuery = query;
+      oldFilters = filters;
+      page = 0;
+      noMorePages = false;
     }
 
     if (!query && _.isEmpty(filters)) {
       // nothing is being searched for
-      results.innerHTML = renderCourses({courses: []});
-    } else {
-      page = advancePage ? page + 1 : 0;
-      loading.classList.add('active');
-
-      SearchModel.match(query, filters, page, function(courses) {
-        loading.classList.remove('active');
-
-        // limit length of descriptions
-        courses.forEach(function(course) {
-          if (course.description.length > DESCRIPTION_CONDENSED_LENGTH) {
-            course.condensedDescription = course.description.substring(0,
-              DESCRIPTION_CONDENSED_LENGTH) + '...';
-          }
-        });
-
-        var coursesHTML = renderCourses({courses: courses});
-        if (advancePage && courses.length === 0) {
-          page -= 1;  // page number has saturated
-        } else if (advancePage && courses.length > 0) {
-          results.innerHTML += coursesHTML;
-        } else {
-          results.innerHTML = coursesHTML;
-        }
+      results.innerHTML = renderCourses({
+        courses: [],
+        appendResults: false,
+        noSearch: true
       });
+      return;
     }
 
-    oldQuery = query;
-    oldFilters = filters;
+    // perform search
+    loading.classList.add('active');
+    SearchModel.match(query, filters, page, function(courses) {
+      loading.classList.remove('active');
+
+      updateSearchResults(courses, advancePage);
+      noMorePages = courses.length == 0;
+    });
+  }
+
+  /* Updates the search results in the DOM based on the given array of courses.
+   * Appends the courses if appendResults is true. */
+  function updateSearchResults(courses, appendResults) {
+    // limit length of descriptions
+    courses.forEach(function(course) {
+      if (course.description.length > DESCRIPTION_CONDENSED_LENGTH) {
+        course.condensedDescription = course.description.substring(0,
+          DESCRIPTION_CONDENSED_LENGTH) + '...';
+      }
+    });
+
+    var coursesHTML = renderCourses({
+      courses: courses,
+      appendResults: appendResults,
+      noSearch: false
+    });
+
+    if (appendResults) {
+      results.innerHTML += coursesHTML;
+    } else {
+      results.innerHTML = coursesHTML;
+    }
+  }
+
+  /* Begins a new search with the latest user input. See documentation for
+   * the `search()` function. */
+  function beginSearch() {
+    search(false);
   }
 
   // update results when user input changes
-  searchBox.addEventListener('keyup', _.debounce(updateSearchResults, 150));
+  searchBox.addEventListener('keyup', _.debounce(beginSearch, 150));
   Array.prototype.forEach.call(checkboxes, function(checkbox) {
-    checkbox.addEventListener('change', updateSearchResults);
+    checkbox.addEventListener('change', beginSearch);
   });
 
   // infinite scroll: update search results when user scrolls to bottom
@@ -103,7 +143,7 @@
     var scrollY = window.scrollY || document.body.scrollTop;
 
     if (window.innerHeight + scrollY >= document.body.offsetHeight) {
-      updateSearchResults(null, true);
+      search(true);
     }
   }, 100));
 
@@ -134,6 +174,6 @@
     }
   });
 
-  updateSearchResults();
+  search(false);
   searchBox.focus();
 })(this, this.document);
