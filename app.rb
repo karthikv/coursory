@@ -17,7 +17,7 @@ module ECI
 
     # home page with search box
     get '/' do
-      render('index.erb', :title => 'Explore Courses Instant',
+      render('index.erb', :title => 'Coursory - Search Courses Quickly',
              :terms => ECI::Search::TERMS, :units => ECI::Search::UNITS,
              :gers => ECI::Search::GERS, :subjects => ECI::Search::SUBJECTS)
     end
