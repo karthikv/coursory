@@ -133,7 +133,7 @@
   }
 
   // update results when user input changes
-  searchBox.addEventListener('keyup', _.debounce(beginSearch, 150));
+  searchBox.addEventListener('keyup', _.debounce(beginSearch, 250));
   Array.prototype.forEach.call(checkboxes, function(checkbox) {
     checkbox.addEventListener('change', beginSearch);
   });
