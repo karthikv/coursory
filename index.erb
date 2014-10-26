@@ -114,7 +114,7 @@
             
             {% if (course.gers) { %}
               <span class="separator">&bull;</span>
-              {{ course.gers }}
+              {{ course.gers.join(', ') }}
             {% } %}
           </div>
 
