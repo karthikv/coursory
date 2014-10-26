@@ -15,6 +15,9 @@ gem 'bson_ext'
 
 gem 'sanitize'  # cleaning HTML
 
+# production
+gem 'unicorn'
+
 group :development do
   gem 'thin'  # web server
   gem 'pry'  # debugging

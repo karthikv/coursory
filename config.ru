@@ -1,3 +1,3 @@
 require './app'
 
-ECI::App.run!
+run ECI::App.new
