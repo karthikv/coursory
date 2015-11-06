@@ -1,0 +1,2 @@
+MONGODB_URI: mongodb://mongo/eci
+ES_HOST: elasticsearch

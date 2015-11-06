@@ -117,7 +117,7 @@ module ECI
       end
 
       # search via Elasticsearch
-      es = Elasticsearch::Client.new
+      es = Elasticsearch::Client.new(:host => ENV['ES_HOST'])
       results = es.search(:index => ES_INDEX_NAME, :type => ES_TYPE_NAME,
         :body => body, :from => page * RESULTS_PER_PAGE)
       hits = results['hits']['hits']

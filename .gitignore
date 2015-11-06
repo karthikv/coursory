@@ -1,6 +1,7 @@
 *.sw[pon]
 .env
 .vagrant
+.ruby-version
 Vagrantfile
 data/
 courses.xml
